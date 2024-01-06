@@ -46,12 +46,15 @@ const Fitness = () => {
     console.error(err)
   })
 
-  const handleEditClick = (id: any, newName: string) => 
-    axios.patch(`http://localhost:8080/api/fitnessFunction/${id}?newName=${newName}`, {
+  const handleEditClick = (id: any, newName: string, newDimension: number) => 
+    axios.patch(`http://localhost:8080/api/fitnessFunction/${id}`, {
       id: id,
+      name: newName,
+      dimension: newDimension,
+      domainArray: formFields,
   })
   .then((res) => {
-    console.log(res);
+    setResponse("Created");
   })
   .catch((err) => {
     console.error(err)

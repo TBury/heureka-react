@@ -52,7 +52,7 @@ const Fitness = () => {
       },
       data: JSON.stringify(functions)
     };
-
+    
     axios.request(config)
       .then((res) => {
         setIsAlgorithmTestRunning(false);
@@ -81,6 +81,8 @@ const Fitness = () => {
       signals: controller,
       data: JSON.stringify(algorithms)
     };
+
+
     axios.request(config)
       .then((res) => {
         setIsFitnessTestRunning(false);
@@ -142,6 +144,16 @@ const Fitness = () => {
       .catch((err) => console.error(err));
   }
 
+  const abortSession = (id, algorithms, FitnessFunctions) => {
+    if (algorithms.length > 1) {
+      setIsFitnessTestRunning(false);
+    }
+    else if (FitnessFunctions.length > 1) {
+      setIsAlgorithmTestRunning(false);
+    }
+  }
+
+
 
   return (
     <>
@@ -163,6 +175,7 @@ const Fitness = () => {
             sessions={tasks}
             resumeSession={resumeSession}
             setPDFDownloadLink={getPDFDownloadLink}
+            abortSession={abortSession}
           />
         )}
       </div>
