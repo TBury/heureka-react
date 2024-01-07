@@ -10,9 +10,15 @@ const Fitness = () => {
   const [formFields, setFormFields] = useState([])
 
   const handleFormChange = (event, index) => {
-    let data = [...formFields];
-    data[index][parseInt(event.target.name)] = parseInt(event.target.value);
-    setFormFields(data);
+    if (event != "reset") {
+      let data = [...formFields];
+      data[index][parseFloat(event.target.name)] = parseFloat(event.target.value);
+      setFormFields(data);
+    }
+    else {
+      setFormFields([]);
+    }
+
   }
 
   const addFields = () => {
@@ -20,7 +26,7 @@ const Fitness = () => {
       left: '',
       right: ''
     }
-    setFormFields([...formFields, [parseInt(object.left), parseInt(object.right)]])
+    setFormFields([...formFields, [parseFloat(object.left), parseFloat(object.right)]])
   }
 
   const removeFields = (index) => {
@@ -31,62 +37,82 @@ const Fitness = () => {
 
   useEffect(() => {
     fetch('http://localhost:8080/api/fitnessFunction/')
-    .then(res => res.json())
-    .then(data => {
-      setResult(data);
-    })
+      .then(res => res.json())
+      .then(data => {
+        setResult(data);
+      })
   }, [])
 
-  const handleDeleteClick = (id) => 
+  const handleDeleteClick = (id) =>
     axios.delete(`http://localhost:8080/api/fitnessFunction/${id}`)
-  .then((res) => {
-    setResponse("Deleted");
-  })
-  .catch((err) => {
-    console.error(err)
-  })
+      .then((res) => {
+        setResponse("Deleted");
+      })
+      .catch((err) => {
+        console.error(err)
+      })
 
-  const handleEditClick = (id: any, newName: string, newDimension: number) => 
+  const handleEditClick = (id: any, newName: string, newDimension: number) =>
     axios.patch(`http://localhost:8080/api/fitnessFunction/${id}`, {
       id: id,
       name: newName,
       dimension: newDimension,
       domainArray: formFields,
-  })
-  .then((res) => {
-    setResponse("Created");
-  })
-  .catch((err) => {
-    console.error(err)
-  })
+    })
+      .then((res) => {
+        setResponse("Created");
+      })
+      .catch((err) => {
+        console.error(err)
+      })
 
 
-  const handleAddClick = (name: string, dimension: number, file: File) => {
+  const handleAddClick = async (name: string, dimension: any, file: File) => {
     setError([])
     let formData = new FormData();
     formData.append('file', file);
     axios.post(`http://localhost:8080/api/fitnessFunction/file/`, formData)
-    .then((res) => {
-      const newFitnessFunctionDto = {
-        name: name,
-        fileName: file.name,
-        dimension: dimension,
-        domainArray: formFields,
-        removable: true
-      }
-      axios.post(`http://localhost:8080/api/fitnessFunction/`, 
-        JSON.stringify(newFitnessFunctionDto),
-        {
-          headers: {
-            'Content-Type': 'application/json' ,
-            'Accept': 'application/json' ,
-          }
-        }
-      )
       .then((res) => {
-        setResponse("Created");
+        if (res.status === 200) {
+          if (dimension == "")
+            dimension = null
+          const newFitnessFunctionDto = {
+            name: name,
+            fileName: file.name,
+            dimension: dimension,
+            domainArray: formFields,
+            removable: true
+          }
+          axios.post(`http://localhost:8080/api/fitnessFunction/`,
+            JSON.stringify(newFitnessFunctionDto),
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+              }
+            }
+          )
+            .then((res) => {
+              if (res.statusText === "Created") {
+                setError([])
+                setResponse(res.statusText);
+                return res.statusText;
+              }
+              
+            })
+            .catch(err => {
+              if (err.response.data.errors !== undefined) {
+                const errors = Object.values(err.response.data.errors).flat()
+                setError(errors)
+              }
+              else {
+                setError([err.response.data])
+              }
+            })
+        }
       })
       .catch(err => {
+        setResponse("error")
         if (err.response.data.errors !== undefined) {
           const errors = Object.values(err.response.data.errors).flat()
           setError(errors)
@@ -95,26 +121,15 @@ const Fitness = () => {
           setError([err.response.data])
         }
       })
-    })
-    .catch(err => {
-      setResponse("error")
-      if (err.response.data.errors !== undefined) {
-        const errors = Object.values(err.response.data.errors).flat()
-        setError(errors)
-      }
-      else {
-        setError([err.response.data])
-      }
-    })
   }
-    
 
-  
+
+
   return (
     <>
       <h1 className='text-3xl font-bold mb-8 mt-2'>Funkcje celu</h1>
       <div className="flex flex-col gap-10">
-        <FitnessComponent 
+        <FitnessComponent
           functions={result}
           formFields={formFields}
           handleFormChange={handleFormChange}
