@@ -27,7 +27,6 @@ const Fitness = () => {
         settasks(res.data);
       })
       .catch((err) => console.error(err))
-     setInterval(handleSessionChange, 5000);
   }, [])
 
   const handleDeleteClick = (id) =>
