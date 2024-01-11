@@ -243,18 +243,16 @@ const Fitness = ({ firstAlgorithm, firstFunction, algorithms, functions, handleD
                   </td>
                   <td className="border-b border-[#eee] py-5 px-4 pl-9 dark:border-strokedark xl:pl-11">
                     <h5 className="font-medium text-black dark:text-white">
-                      {Array.from(new Set(session.tests.map(t => t.algorithmId))).map((el) => {
-                        return `${algorithms.find(a => a.id === el).name} `
-                      })
-                      }
+                      {session.algorithms.map((alg) => {
+                        return alg;
+                      })}
                     </h5>
                   </td>
                   <td className="border-b border-[#eee] py-5 px-4 pl-9 dark:border-strokedark xl:pl-11">
                     <h5 className="font-medium text-black dark:text-white">
-                      {Array.from(new Set(session.tests.map(t => t.fitnessFunctionId))).map((el) => {
-                        return `${functions.find(f => f.id === el).name} `
-                      })
-                      }
+                      {session.fitnessFunctions.map((func) => {
+                        return `${func} `
+                      })}
                     </h5>
                   </td>
                   <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
@@ -281,14 +279,14 @@ const Fitness = ({ firstAlgorithm, firstFunction, algorithms, functions, handleD
                     <div className="flex items-center space-x-3.5">
                       {session.state === "RUNNING" && 
                       <button className="hover:text-primary" onClick={() => {
-                        abortSession(session.sessionId, Array.from(new Set(session.tests.map(t => t.algorithmId))), Array.from(new Set(session.tests.map(t => t.fitnessFunctionId))));
+                        abortSession(session.sessionId, session.algorithms, session.fitnessFunctions);
                       }}>
                         <svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 512 512"><path d="M367.2 412.5L99.5 144.8C77.1 176.1 64 214.5 64 256c0 106 86 192 192 192c41.5 0 79.9-13.1 111.2-35.5zm45.3-45.3C434.9 335.9 448 297.5 448 256c0-106-86-192-192-192c-41.5 0-79.9 13.1-111.2 35.5L412.5 367.2zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256z" /></svg>
                       </button>
                       }
                       {session.state === "SUSPENDED" &&
                         <button onClick={() => {
-                          resumeSession(session.sessionId, Array.from(new Set(session.tests.map(t => t.algorithmId))), Array.from(new Set(session.tests.map(t => t.fitnessFunctionId))))
+                          resumeSession(session.sessionId, session.algorithms, session.fitnessFunctions)
                         }} className="hover:text-primary">
                           <svg className="fill-current" xmlns="http://www.w3.org/2000/svg" height="16" width="12" viewBox="0 0 384 512"><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z" /></svg>
                         </button>

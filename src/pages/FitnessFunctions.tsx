@@ -6,6 +6,7 @@ const Fitness = () => {
   const [result, setResult] = useState([]);
   const [response, setResponse] = useState('');
   const [fileName, setFileName] = useState('');
+  const [dimension, setDimension] = useState(0);
   const [error, setError] = useState([]);
   const [formFields, setFormFields] = useState([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -25,14 +26,9 @@ const Fitness = () => {
   };
 
   const addFields = () => {
-    let object = {
-      left: '',
-      right: '',
-    };
-    setFormFields([
-      ...formFields,
-      [parseFloat(object.left), parseFloat(object.right)],
-    ]);
+    let data = [...formFields]
+    data.push([0.0, 0.0])
+    setFormFields(data);
   };
 
   const removeFields = (index) => {
@@ -47,7 +43,7 @@ const Fitness = () => {
       .then((data) => {
         setResult(data);
       });
-  }, [response]);
+  }, [formFields]);
 
   function handleDeleteClick(id: number) {
     axios
@@ -141,6 +137,16 @@ const Fitness = () => {
       });
   }
 
+  const setNewDimension = (dimension: number) => {
+    setFormFields([]);
+    let fields = []
+    for (let i = 0; i < dimension; i++) {
+      fields.push([0.0, 0.0])
+    }
+    setDimension(dimension);
+    setFormFields(fields);
+  }
+
   return (
     <>
       <h1 className="text-3xl font-bold mb-8 mt-2">Funkcje celu</h1>
@@ -149,19 +155,18 @@ const Fitness = () => {
           functions={result}
           formFields={formFields}
           handleFormChange={handleFormChange}
-          addFields={addFields}
-          removeFields={removeFields}
           handleDeleteClick={handleDeleteClick}
           handleEditClick={handleEditClick}
           handleAddClick={handleAddClick}
           error={error}
-          domain={formFields}
           showDeleteModal={showDeleteModal}
           setShowDeleteModal={setShowDeleteModal}
           showEditModal={showEditModal}
           setShowEditModal={setShowEditModal}
           showAddModal={showAddModal}
           setShowAddModal={setShowAddModal}
+          newDimension={dimension}
+          setNewDimension={setNewDimension}
         />
       </div>
     </>
