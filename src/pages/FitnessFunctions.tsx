@@ -16,25 +16,13 @@ const Fitness = () => {
   const handleFormChange = (event, index) => {
     if (event != 'reset') {
       let data = [...formFields];
-      data[index][parseFloat(event.target.name)] = parseFloat(
+      data[index][parseInt(event.target.name)] = parseFloat(
         event.target.value,
       );
       setFormFields(data);
     } else {
       setFormFields([]);
     }
-  };
-
-  const addFields = () => {
-    let data = [...formFields]
-    data.push([0.0, 0.0])
-    setFormFields(data);
-  };
-
-  const removeFields = (index) => {
-    let data = [...formFields];
-    data.splice(index, 1);
-    setFormFields(data);
   };
 
   useEffect(() => {
@@ -147,6 +135,10 @@ const Fitness = () => {
     setFormFields(fields);
   }
 
+  const setEditFields = (domainArray: any) => {
+    setFormFields(domainArray);
+  }
+
   return (
     <>
       <h1 className="text-3xl font-bold mb-8 mt-2">Funkcje celu</h1>
@@ -167,6 +159,7 @@ const Fitness = () => {
           setShowAddModal={setShowAddModal}
           newDimension={dimension}
           setNewDimension={setNewDimension}
+          setEditFields={setEditFields}
         />
       </div>
     </>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import TasksComponent from '../components/Tasks';
 import axios from 'axios';
 
@@ -27,7 +27,6 @@ const Fitness = () => {
     axios
       .get('http://localhost:8080/api/session')
       .then((res) => {
-        console.log(res.data);
         settasks(res.data);
       })
       .catch((err) => console.error(err));
@@ -42,11 +41,10 @@ const Fitness = () => {
       .catch((err) => {
         console.error(err);
       });
-
+  
+  let abortControllerRef = useRef(new AbortController());
   const handleTestAlgorithmClick = (algorithm, functions) => {
-    const controller = new AbortController();
     setIsAlgorithmTestRunning(true);
-
     const progressInterval = setInterval(handleProgress, 5000);
     let config = {
       method: 'post',
@@ -56,27 +54,33 @@ const Fitness = () => {
         'Content-Type': 'application/json',
       },
       data: [...functions],
+      signal: abortControllerRef.current.signal,
     };
-    
+
     axios
       .request(config)
       .then((res) => {
         setIsAlgorithmTestRunning(false);
         setResponse(res.data);
         clearInterval(progressInterval);
+        handleSessionChange();
       })
       .catch((err) => {
         setIsAlgorithmTestRunning(false);
-        console.log(err.response.data.errors);
         clearInterval(progressInterval);
+        handleSessionChange();
+        if(!axios.isCancel(err)) {
+          console.error(err.response.data.errors);
+        }
+        else {
+          console.log("poprawnie przerwano")
+        }
       });
   };
 
   const handleTestFunctionClick = (fun, algorithms) => {
-    const controller = new AbortController();
     setIsFitnessTestRunning(true);
     const progressInterval = setInterval(handleProgress, 5000);
-
     let config = {
       method: 'post',
       maxBodyLength: Infinity,
@@ -84,25 +88,33 @@ const Fitness = () => {
       headers: {
         'Content-Type': 'application/json',
       },
-      signals: controller,
+      signal: abortControllerRef.current.signal,
       data: JSON.stringify(algorithms),
     };
-
+    handleSessionChange();
     axios
       .request(config)
       .then((res) => {
         setIsFitnessTestRunning(false);
         setResponse(res.data);
         clearInterval(progressInterval);
+        handleSessionChange();
       })
       .catch((err) => {
         setIsFitnessTestRunning(false);
-        console.error(err.response.data.errors);
         clearInterval(progressInterval);
+        handleSessionChange();
+        if(!axios.isCancel(err)) {
+          console.error(err.response.data.errors);
+        }
+        else {
+          console.log("poprawnie przerwano")
+        }
       });
   };
 
   const handleProgress = () => {
+    handleSessionChange();
     axios
       .get(`http://localhost:8080/api/task`, {
         timeout: 360000,
@@ -122,26 +134,43 @@ const Fitness = () => {
       .catch((err) => console.error(err));
   };
 
-  const resumeSession = (id, algorithms, FitnessFunctions) => {
+  const resumeSession = (id, isAlgorithmTested, algorithms, FitnessFunctions) => {
+    if (!isAlgorithmTested) {
+      setIsFitnessTestRunning(true);
+    } else {
+      setIsAlgorithmTestRunning(true);
+    }
+    setProgress([]);
+    const progressInterval = setInterval(handleProgress, 5000);
+    let config = {
+      method: 'post',
+      maxBodyLength: Infinity,
+      url: `http://localhost:8080/api/task/${id}?resume=true`,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      signal: abortControllerRef.current.signal,
+      data: {},
+    };
+
     axios
-      .post(`http://localhost:8080/api/task/${id}?resume=true`)
-      .then((res) => {
-        if (algorithms.length > 1) {
-          setIsFitnessTestRunning(true);
-        } else if (FitnessFunctions.length > 1) {
-          setIsAlgorithmTestRunning(true);
-        }
-        setInterval(handleProgress, 5000);
-        axios
-          .get('http://localhost:8080/api/session')
-          .then((res) => {
-            settasks(res.data);
-          })
-          .catch((err) => console.error(err));
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+    .request(config)
+    .then((res) => {
+      setResponse(res.data);
+      clearInterval(progressInterval);
+      handleSessionChange();
+    })
+    .catch((err) => {
+      clearInterval(progressInterval);
+      handleSessionChange();
+      if(!axios.isCancel(err)) {
+        console.error(err.response.data.errors);
+      }
+      else {
+        console.log("poprawnie przerwano")
+      }
+    });
+    handleSessionChange();
   };
 
   const getPDFDownloadLink = (id) => {
@@ -154,12 +183,16 @@ const Fitness = () => {
       .catch((err) => console.error(err));
   };
 
-  const abortSession = (id, algorithms, FitnessFunctions) => {
-    if (algorithms.length > 1) {
+  const abortSession = (id, isAlgorithmTested, algorithms, FitnessFunctions) => {
+    if (!isAlgorithmTested) {
       setIsFitnessTestRunning(false);
-    } else if (FitnessFunctions.length > 1) {
+    } else {
       setIsAlgorithmTestRunning(false);
     }
+    abortControllerRef.current.abort();
+    handleSessionChange();
+    abortControllerRef.current = new AbortController();
+    setProgress([]);
   };
 
   return (

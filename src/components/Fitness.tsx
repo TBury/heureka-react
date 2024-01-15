@@ -17,6 +17,7 @@ const Fitness = ({
   setShowAddModal,
   newDimension,
   setNewDimension,
+  setEditFields,
 }) => {
   const [newName, setNewName] = useState('');
   const [newFunctionName, setnewFunctionName] = useState('');
@@ -224,6 +225,7 @@ const Fitness = ({
                           setSelectedItem(fun.name);
                           setNewName(fun.name);
                           setNewDimension(fun.dimension);
+                          setEditFields(fun.domainArray);
                         }}
                         className="hover:text-primary"
                       >
@@ -287,7 +289,7 @@ const Fitness = ({
                                   />
                                 </div>
                                 <div className="grid grid-cols-2 gap-4" key={fun.id}>
-                                  {fun.domainArray.map((form, index) => {
+                                  {formFields.map((form, index) => {
                                     return (
                                       <Fragment >
                                         <TextInput
