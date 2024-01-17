@@ -4,6 +4,7 @@ const Zadania = lazy(() => import('../pages/Zadania'));
 const Algorytmy = lazy(() => import('../pages/Algorytmy'));
 const Fitness = lazy(() => import('../pages/FitnessFunctions'));
 const Tasks = lazy(() => import('../pages/Zadania'));
+const Instrukcja = lazy(() => import('../pages/Instrukcje'));
 
 const coreRoutes = [
   {
@@ -25,6 +26,11 @@ const coreRoutes = [
     path: '/tasks',
     title: 'Tasks',
     component: Tasks,
+  },
+  {
+    path: '/instrukcja',
+    title: 'Instrukcja',
+    component: Instrukcja,
   },
 ];
 
