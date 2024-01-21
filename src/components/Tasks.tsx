@@ -18,6 +18,7 @@ const Fitness = ({
   resumeSession,
   setPDFDownloadLink,
   abortSession,
+  cookieValue
 }) => {
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState('');
@@ -52,7 +53,7 @@ const Fitness = ({
     <main>
       <div className="grid grid-cols-2 gap-x-8">
         <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-          {algorithmTestRunning === true ? (
+          {algorithmTestRunning === true || cookieValue === "algorithmTest" ? (
             <Fragment>
               <div className="p-6.5">
                 <h1 className="font-bold text-3xl text-center">
@@ -70,7 +71,7 @@ const Fitness = ({
                           functions.find((f) => f.id === p.fitnessFunctionId)
                             .name
                         }
-                        ... {p.progress}%
+                        ... {p.progress * 100}%
                       </p>
                     );
                   })}
@@ -224,7 +225,7 @@ const Fitness = ({
           )}
         </div>
         <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-          {fitnessTestRunning === true ? (
+          {fitnessTestRunning === true || cookieValue === "fitnessTest" ? (
             <Fragment>
               <div className="p-6.5">
                 <h1 className="font-bold text-3xl text-center">

@@ -12,11 +12,11 @@ const Instrukcja = () => {
     <main>
         <p className='mb-4'>Aby rozpocząć pracę z systemem, należy dodać funkcję celu: </p>
         <img src={Step1} className='mb-8' />
-        <p className="mb-4">Należy wypełnić poprawną nazwę funkcji celu, podać jej wymiar, dziedzinę oraz plik .dll. Jeżeli wymiar pozostanie pusty, to zostanie przyjęty wymiar oraz dziedzina. Nazwa pliku .dll nie może już występować na serwerze.</p>
+        <p className="mb-4">Należy wypełnić poprawną nazwę funkcji celu, podać jej wymiar, dziedzinę oraz plik .dll. Jeżeli wymiar pozostanie pusty, to zostanie odgórnie przyjęty wymiar oraz dziedzina. Wymiar równy 0 oznaczać będzie wymiar dowolny. Wtedy należy wpisać przedział [min, max] dla dziedziny. Funkcja musi być osobną klasą o nazwie podanej w formularzu i musi implementować interfejs <code>IFitnessFunction</code>.</p>
         <img src={Step2} className='mb-8' />
-        <p className="mb-4">Analogicznie należy postąpić przy dodawaniu algorytmu.</p>
+        <p className="mb-4">Analogicznie należy postąpić przy dodawaniu algorytmu. Algorytm musi być osobną klasą o nazwie takiej, jak podano w formularzu i implementować interfejs IOptimizationAlgorithm.</p>
         <img src={Step3} className='mb-8' />
-        <p className="mb-4">Tutaj również należy zadbać, by nazwa pliku nie występowała już na serwerze.</p>
+        <p className="mb-4">Należy zadbać, by nazwa pliku nie występowała już na serwerze.</p>
         <img src={Step4} className='mb-8' />
         <p className="mb-4">Po dodaniu algorytmów i funkcji celu, można uruchomić zadanie - testowanie algorytmu funkcjami celu lub odwrotnie. Należy wybrać odpowiedni algorytm i funkcję celu.</p>
         <img src={Step5} className='mb-8' />

@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import TasksComponent from '../components/Tasks';
 import axios from 'axios';
+import Cookies from 'universal-cookie';
+
+
 
 const Fitness = () => {
   const [algorithms, setAlgorithms] = useState([]);
@@ -10,6 +13,7 @@ const Fitness = () => {
   const [isFitnessTestRunning, setIsFitnessTestRunning] = useState(false);
   const [response, setResponse] = useState('');
   const [progress, setProgress] = useState([]);
+  const cookies = new Cookies();
 
   useEffect(() => {
     axios
@@ -30,6 +34,10 @@ const Fitness = () => {
         settasks(res.data);
       })
       .catch((err) => console.error(err));
+
+    if (cookies.get("testRunning")) {
+      setInterval(handleProgress, 2500);
+    }
   }, []);
 
   const handleDeleteClick = (id) =>
@@ -45,7 +53,7 @@ const Fitness = () => {
   let abortControllerRef = useRef(new AbortController());
   const handleTestAlgorithmClick = (algorithm, functions) => {
     setIsAlgorithmTestRunning(true);
-    const progressInterval = setInterval(handleProgress, 5000);
+    const progressInterval = setInterval(handleProgress, 2500);
     let config = {
       method: 'post',
       maxBodyLength: Infinity,
@@ -56,7 +64,7 @@ const Fitness = () => {
       data: [...functions],
       signal: abortControllerRef.current.signal,
     };
-
+    cookies.set('testRunning', 'algorithmTest', { path: '/' });
     axios
       .request(config)
       .then((res) => {
@@ -80,7 +88,7 @@ const Fitness = () => {
 
   const handleTestFunctionClick = (fun, algorithms) => {
     setIsFitnessTestRunning(true);
-    const progressInterval = setInterval(handleProgress, 5000);
+    const progressInterval = setInterval(handleProgress, 2500);
     let config = {
       method: 'post',
       maxBodyLength: Infinity,
@@ -92,6 +100,7 @@ const Fitness = () => {
       data: JSON.stringify(algorithms),
     };
     handleSessionChange();
+    cookies.set('testRunning', 'fitnessTest', { path: '/' });
     axios
       .request(config)
       .then((res) => {
@@ -99,11 +108,13 @@ const Fitness = () => {
         setResponse(res.data);
         clearInterval(progressInterval);
         handleSessionChange();
+        cookies.remove('testRunning');
       })
       .catch((err) => {
         setIsFitnessTestRunning(false);
         clearInterval(progressInterval);
         handleSessionChange();
+        cookies.remove('testRunning');
         if(!axios.isCancel(err)) {
           console.error(err.response.data.errors);
         }
@@ -137,11 +148,13 @@ const Fitness = () => {
   const resumeSession = (id, isAlgorithmTested, algorithms, FitnessFunctions) => {
     if (!isAlgorithmTested) {
       setIsFitnessTestRunning(true);
+      cookies.set('testRunning', 'fitnessTest', { path: '/' });
     } else {
       setIsAlgorithmTestRunning(true);
+      cookies.set('testRunning', 'algorithmTest', { path: '/' });
     }
     setProgress([]);
-    const progressInterval = setInterval(handleProgress, 5000);
+    const progressInterval = setInterval(handleProgress, 2500);
     let config = {
       method: 'post',
       maxBodyLength: Infinity,
@@ -186,9 +199,11 @@ const Fitness = () => {
   const abortSession = (id, isAlgorithmTested, algorithms, FitnessFunctions) => {
     if (!isAlgorithmTested) {
       setIsFitnessTestRunning(false);
+      cookies.remove("testRunning")
     } else {
       setIsAlgorithmTestRunning(false);
     }
+    cookies.remove("testRunning")
     abortControllerRef.current.abort();
     handleSessionChange();
     abortControllerRef.current = new AbortController();
@@ -216,6 +231,7 @@ const Fitness = () => {
             resumeSession={resumeSession}
             setPDFDownloadLink={getPDFDownloadLink}
             abortSession={abortSession}
+            cookieValue={cookies.get("testRunning")}
           />
         )}
       </div>

@@ -8,7 +8,7 @@ const Fitness = () => {
   const [fileName, setFileName] = useState('');
   const [dimension, setDimension] = useState(0);
   const [error, setError] = useState([]);
-  const [formFields, setFormFields] = useState([]);
+  const [formFields, setFormFields] = useState([[]]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -48,6 +48,9 @@ const Fitness = () => {
   }
 
   function handleEditClick(id: number, newName: string, newDimension: number) {
+    if (newDimension === undefined || newDimension === "") {
+      setNewDimension(0);
+    }
     axios
       .patch(`http://localhost:8080/api/fitnessFunction/${id}`, {
         id: id,
@@ -72,18 +75,22 @@ const Fitness = () => {
       });
   }
 
-  function handleAddClick(name: string, dimension: any, file: File) {
+  function handleAddClick(name: string, dim: any, file: File) {
+    if (dim === undefined || dim === "") {
+      dim = "0";
+    }
+
     setError([]);
     let formData = new FormData();
     formData.append('file', file);
     axios
       .post(`http://localhost:8080/api/fitnessFunction/file/`, formData)
       .then((res) => {
-        if (dimension == '') dimension = null;
+        if (dim == '') dim = null;
         const newFitnessFunctionDto = {
           name: name,
           fileName: file.name,
-          dimension: parseInt(dimension),
+          dimension: parseInt(dim),
           domainArray: formFields,
           removeable: true,
         };
@@ -125,12 +132,21 @@ const Fitness = () => {
       });
   }
 
-  const setNewDimension = (dimension: number) => {
+  const setNewDimension = (dimension: any) => {
+    if (dimension === undefined || dimension === "") {
+      dimension = 0;
+    } 
     setFormFields([]);
     let fields = []
-    for (let i = 0; i < dimension; i++) {
-      fields.push([0.0, 0.0])
+    if (dimension == 0) {
+      fields.push([null, null])
     }
+    else {
+      for (let i = 0; i < dimension; i++) {
+        fields.push([null, null])
+      }
+    }
+    
     setDimension(dimension);
     setFormFields(fields);
   }
