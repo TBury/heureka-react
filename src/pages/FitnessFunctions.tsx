@@ -6,9 +6,9 @@ const Fitness = () => {
   const [result, setResult] = useState([]);
   const [response, setResponse] = useState('');
   const [fileName, setFileName] = useState('');
-  const [dimension, setDimension] = useState(0);
+  const [dimension, setDimension] = useState();
   const [error, setError] = useState([]);
-  const [formFields, setFormFields] = useState([[]]);
+  const [formFields, setFormFields] = useState([[[null, null]]]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -21,7 +21,7 @@ const Fitness = () => {
       );
       setFormFields(data);
     } else {
-      setFormFields([]);
+      setFormFields([[null, null]]);
     }
   };
 
@@ -48,7 +48,7 @@ const Fitness = () => {
   }
 
   function handleEditClick(id: number, newName: string, newDimension: number) {
-    if (newDimension === undefined || newDimension === "") {
+    if (Number.isNaN(newDimension)) {
       setNewDimension(0);
     }
     axios
@@ -75,14 +75,15 @@ const Fitness = () => {
       });
   }
 
-  function handleAddClick(name: string, dim: any, file: File) {
-    if (dim === undefined || dim === "") {
-      dim = "0";
-    }
 
+  function handleAddClick(name: string, dim: any, file: File) {
     setError([]);
     let formData = new FormData();
     formData.append('file', file);
+    let domain = formFields;
+    if (dim == "" || dim == undefined) {
+      domain = formFields[0];
+    }
     axios
       .post(`http://localhost:8080/api/fitnessFunction/file/`, formData)
       .then((res) => {
@@ -133,9 +134,6 @@ const Fitness = () => {
   }
 
   const setNewDimension = (dimension: any) => {
-    if (dimension === undefined || dimension === "") {
-      dimension = 0;
-    } 
     setFormFields([]);
     let fields = []
     if (dimension == 0) {

@@ -196,7 +196,11 @@ const Fitness = () => {
       .catch((err) => console.error(err));
   };
 
-  const abortSession = (id, isAlgorithmTested, algorithms, FitnessFunctions) => {
+  function timeout(delay: number) {
+    return new Promise( res => setTimeout(res, delay) );
+  }
+
+  const abortSession = async (id, isAlgorithmTested, algorithms, FitnessFunctions) => {
     if (!isAlgorithmTested) {
       setIsFitnessTestRunning(false);
       cookies.remove("testRunning")
@@ -205,10 +209,19 @@ const Fitness = () => {
     }
     cookies.remove("testRunning")
     abortControllerRef.current.abort();
-    handleSessionChange();
     abortControllerRef.current = new AbortController();
     setProgress([]);
+    await timeout(500);
+    axios
+      .get('http://localhost:8080/api/session')
+      .then((res) => {
+        settasks(res.data);
+      })
+      .catch((err) => console.error(err));
   };
+
+
+  
 
   return (
     <>

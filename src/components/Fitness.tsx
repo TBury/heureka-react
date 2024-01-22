@@ -179,6 +179,7 @@ const Fitness = ({
           </thead>
           <tbody>
             {functions.map((fun) => {
+              console.log(fun.dimension);
               return (
                 <tr key={fun.id}>
                   <td className="border-b border-[#eee] py-5 px-4 pl-9 dark:border-strokedark xl:pl-11">
@@ -188,7 +189,7 @@ const Fitness = ({
                   </td>
                   <td className="border-b border-[#eee] py-5 px-4 pl-9 dark:border-strokedark xl:pl-11">
                     <h5 className="font-medium text-black dark:text-white">
-                      {fun.dimension === null ? 0 : fun.dimension}
+                      {Number.isNaN(fun.dimension) || fun.dimension == null ? "dowolny" : fun.dimension}
                     </h5>
                   </td>
                   <td className="border-b border-[#eee] py-5 px-4 pl-9 dark:border-strokedark xl:pl-11">
