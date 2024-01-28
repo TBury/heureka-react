@@ -82,7 +82,7 @@ const Fitness = () => {
     formData.append('file', file);
     let domain = formFields;
     if (dim == "" || dim == undefined) {
-      domain = formFields[0];
+      domain = [];
     }
     axios
       .post(`http://localhost:8080/api/fitnessFunction/file/`, formData)
@@ -92,7 +92,7 @@ const Fitness = () => {
           name: name,
           fileName: file.name,
           dimension: parseInt(dim),
-          domainArray: formFields,
+          domainArray: domain,
           removeable: true,
         };
         axios
